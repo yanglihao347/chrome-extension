@@ -1,0 +1,12 @@
+{
+  "presets": ["@babel/preset-react", "@babel/preset-env"],
+  "plugins": [
+    [
+      "@babel/plugin-proposal-class-properties", //编译类
+      {
+        "loose": true //将编译类属性以使用赋值表达式而不是Object.defineProperty
+      }
+    ],
+    ["@babel/plugin-transform-runtime"]
+  ]
+}
