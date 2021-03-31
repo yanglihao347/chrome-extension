@@ -39,16 +39,17 @@
 }
 .utils-bar {
   flex: 50px 0 0;
-  padding-top: 30px;
+  padding-top: 20px;
   background: #c0c0c0;
 }
-.add-btn {
+.operate-btn {
   text-align: center;
+  margin-bottom: 12px;
 }
-.add-img {
+.operate-img {
   cursor: pointer;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
 }
 .main-bar {
   flex: 1;
@@ -61,11 +62,30 @@
   height: 50px;
   line-height: 50px;
 }
-.list-container {
+.main-container {
+  height: calc(100% - 50px);
+  overflow-y: auto;
+}
+.list-wrap {
   padding: 10px;
 }
 .card-item {
+  border: 1px solid #dedede;
+  padding: 10px;
   margin: 10px 0;
+  position: relative;
+  overflow: hidden;
+}
+.card-item a {
+  color: #01c1de;
+}
+.input-textarea {
+  width: 100%;
+  border: none;
+  border: 1px solid #dedede;
+  padding: 10px;
+  margin: 5px 0;
+  height: 80px;
 }
 #arrowIcon {
   position: absolute;
@@ -93,4 +113,45 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+#addBtn {
+  width: 120px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 5px;
+  background: rgba(0,0,255,0.7);
+  color: #fff;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 360px;
+}
+
+.card-item:hover .delete-icon {
+  right: 0;
+}
+
+.delete-icon {
+  cursor: pointer;
+  transition: all 0.3s;
+  position: absolute;
+  right: -30px;
+  top: 0;
+  height: 100%;
+  width: 30px;
+  background: #f00;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.test {
+  display: table-column;
+}
+
+::-webkit-scrollbar {
+  width: 0;
 }

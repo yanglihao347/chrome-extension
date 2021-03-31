@@ -2,6 +2,7 @@
 import { apiAccepter } from "./App.js";
 
 const sideDiv = document.createElement("div"); // 侧边栏容器
+let addBtn = null;
 let dragbox = null;
 // 插入根节点div
 const createSideBar = () => {
@@ -10,31 +11,106 @@ const createSideBar = () => {
   document.body.appendChild(sideDiv);
 };
 
-// 定义事件处理方法
-const handleMouseDown = (e) => {
-  // e.preventDefault();
-  if (e.target.tagName === "A") {
-    window.dragInfo = {
-      href: e.target.href,
-      innerText: e.target.innerText,
-    };
-  } else {
-    let tag = null;
-    for (let i = 0; i < e.path.length; i++) {
-      if (e.path[i].tagName === "A") {
-        tag = e.path[i];
-        break;
-      }
-    }
-    if (!!tag) {
-      window.dragInfo = {
-        href: tag.href,
-        innerText: tag.innerText,
-      };
+const isDragable = (e) => {
+  // ** 逻辑易混淆
+  // 该方法判断 是否是(原本不可拖拽但需可拖拽的元素)
+  if (e.target.tagName === "A" || e.target.tagName === "IMG") {
+    return false;
+  }
+  let aNo = 0;
+  for (let i = 0; i < e.path.length; i++) {
+    if (e.path[i].tagName === "A") {
+      aNo = i;
+      break;
     }
   }
-  console.log(window.dragInfo);
-  // let selectionText = window.getSelection().toString();
+  if (!aNo) {
+    return false;
+  }
+  let flag = false;
+  for (let i = 0; i < aNo; i++) {
+    const dis = window.getComputedStyle(e.path[i]).display;
+    console.log(dis, "from isDragable ing ...");
+    switch (dis) {
+      case "inline":
+      case "inline-block":
+      case "inline-table":
+      case "table-cell":
+      case "table-row":
+        break;
+      default:
+        flag = true;
+        break;
+    }
+    if (flag) break;
+  }
+  return flag;
+};
+const getElementLeft = (element) => {
+  var actualLeft = element.offsetLeft;
+  var current = element.offsetParent;
+
+  while (current !== null) {
+    actualLeft += current.offsetLeft;
+    current = current.offsetParent;
+  }
+
+  return actualLeft;
+};
+const getElementTop = (element) => {
+  var actualTop = element.offsetTop;
+  var current = element.offsetParent;
+
+  while (current !== null) {
+    actualTop += current.offsetTop;
+    current = current.offsetParent;
+  }
+
+  return actualTop;
+};
+
+const showAddBtn = (selectionText) => {
+  if (addBtn) {
+    sideDiv.removeChild(addBtn);
+    addBtn = null;
+  }
+  addBtn = document.createElement("div");
+  addBtn.id = "addBtn";
+  addBtn.innerText = "点此添加到文档";
+  addBtn.onclick = () => {
+    console.log("from addbtnclick", selectionText);
+    apiAccepter.addToDoc({ type: "text", selectionText });
+    sideDiv.removeChild(addBtn);
+    addBtn = null;
+  };
+  addBtn.onmouseup = (e) => {
+    e.stopPropagation();
+  };
+  sideDiv.appendChild(addBtn);
+};
+
+// 定义事件处理方法
+const handleMouseDown = (e) => {
+  // e.stopPropagation();
+  if (!isDragable(e)) {
+    return;
+  }
+  let tag = null;
+  for (let i = 0; i < e.path.length; i++) {
+    if (e.path[i].tagName === "A") {
+      tag = e.path[i];
+      break;
+    }
+  }
+  window.dragInfo = {
+    type: "link",
+    href: tag.href,
+    selectionText: e.target.innerText,
+  };
+  dragbox = document.createElement("div");
+  dragbox.id = "dragbox";
+  dragbox.innerHTML = `${e.target.innerText}<br />${tag.href}`;
+  document.body.appendChild(dragbox);
 };
 
 const handleMouseMove = (e) => {
@@ -46,7 +122,14 @@ const handleMouseMove = (e) => {
 };
 
 const handleMouseUp = (e) => {
-  console.log("from document...");
+  const selectionText = window.getSelection().toString();
+  if (selectionText) {
+    showAddBtn(selectionText);
+  } else if (addBtn) {
+    sideDiv.removeChild(addBtn);
+    addBtn = null;
+  }
+
   if (!dragbox) {
     return;
   }
@@ -65,13 +148,31 @@ const handleDragEnd = (e) => {
 };
 const handleDragStart = (e) => {
   console.log(e);
-  console.log(e.target.currentSrc);
   e.preventDefault();
   if (e.target.tagName === "A") {
+    let childElement = null;
+    for (let i = 0; i < e.target.children.length; i++) {
+      if (e.target.children[i].tagName === "IMG") {
+        childElement = {
+          type: "image",
+          src: e.target.children[i].currentSrc,
+          selectionText: "图片",
+        };
+        break;
+      } else if (e.target.children[i].tagName === "SVG") {
+        childElement = {
+          type: "svg",
+          src: e.target.children[i].currentSrc,
+          selectionText: "图片",
+        };
+        break;
+      }
+    }
     window.dragInfo = {
       type: "link",
       href: e.target.href,
       selectionText: e.target.innerText,
+      childElement,
     };
   } else {
     window.dragInfo = {
@@ -81,20 +182,23 @@ const handleDragStart = (e) => {
     };
   }
 
+  if (dragbox) {
+    return;
+  }
   dragbox = document.createElement("div");
   dragbox.id = "dragbox";
   dragbox.innerHTML = `${e.target.innerText}<br />${e.target.href}`;
   document.body.appendChild(dragbox);
 };
-const handleSelect = (e) => {
-  console.log(e);
-};
-// document.addEventListener("mousedown", handleMouseDown);
+// const handleSelect = (e) => {
+//   console.log(e);
+// };
+document.addEventListener("mousedown", handleMouseDown);
 document.addEventListener("mousemove", handleMouseMove);
 document.addEventListener("mouseup", handleMouseUp);
 sideDiv.addEventListener("mouseup", sideMouseUp);
 document.addEventListener("dragend", handleDragEnd);
 document.addEventListener("dragstart", handleDragStart);
-document.addEventListener("select", handleSelect);
+// document.addEventListener("select", handleSelect);
 
 createSideBar();
