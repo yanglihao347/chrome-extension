@@ -2,9 +2,8 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import "./dom.js";
 import styles from "../css/content.css";
-import axios from "axios";
-import config from "./config.js";
-// createSideBar();
+import request from "./request.js";
+
 const sideDiv = document.getElementById("sideDiv");
 let apiAccepter;
 
@@ -158,17 +157,9 @@ class App extends Component {
           </div>
           <div
             onClick={() => {
-              axios
-                .get("https://www.yuque.com/api/v2/users/yanglihao347", {
-                  headers: {
-                    "Content-Type": "application/json",
-                    "User-Agent": "chrome-extension-demo",
-                    "X-Auth-Token": config.token,
-                  },
-                })
-                .then((res) => {
-                  console.log("from axios...", res);
-                });
+              request("getUser").then((res) => {
+                console.log("from content.js ...", res);
+              });
             }}
           >
             请求测试
@@ -212,6 +203,5 @@ ReactDOM.render(
   sideDiv
 );
 
-console.log(apiAccepter);
-
+// 组件内方法给外部js文件调用
 export { apiAccepter };

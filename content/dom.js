@@ -1,4 +1,3 @@
-// import config from "./config.js";
 import { apiAccepter } from "./App.js";
 
 const sideDiv = document.createElement("div"); // 侧边栏容器
@@ -45,28 +44,6 @@ const isDragable = (e) => {
     if (flag) break;
   }
   return flag;
-};
-const getElementLeft = (element) => {
-  var actualLeft = element.offsetLeft;
-  var current = element.offsetParent;
-
-  while (current !== null) {
-    actualLeft += current.offsetLeft;
-    current = current.offsetParent;
-  }
-
-  return actualLeft;
-};
-const getElementTop = (element) => {
-  var actualTop = element.offsetTop;
-  var current = element.offsetParent;
-
-  while (current !== null) {
-    actualTop += current.offsetTop;
-    current = current.offsetParent;
-  }
-
-  return actualTop;
 };
 
 const showAddBtn = (selectionText) => {
@@ -190,15 +167,12 @@ const handleDragStart = (e) => {
   dragbox.innerHTML = `${e.target.innerText}<br />${e.target.href}`;
   document.body.appendChild(dragbox);
 };
-// const handleSelect = (e) => {
-//   console.log(e);
-// };
+
 document.addEventListener("mousedown", handleMouseDown);
 document.addEventListener("mousemove", handleMouseMove);
 document.addEventListener("mouseup", handleMouseUp);
 sideDiv.addEventListener("mouseup", sideMouseUp);
 document.addEventListener("dragend", handleDragEnd);
 document.addEventListener("dragstart", handleDragStart);
-// document.addEventListener("select", handleSelect);
 
 createSideBar();
