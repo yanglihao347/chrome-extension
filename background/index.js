@@ -5,21 +5,13 @@
 //   console.log("Default background color set to %cgreen", `color: ${color}`);
 // });
 
-// chrome.runtime.onInstalled.addListener(function () {
-
-// });
-// import axios from "axios";
-import utils from "./utils.js";
 import models from "./models.js";
-
-const { request } = utils;
 
 chrome.contextMenus.create(
   {
     type: "normal",
     title: "添加进文档",
     contexts: ["all"],
-    // id: "123",
     onclick: (info) => {
       console.log(info);
       // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -34,7 +26,7 @@ chrome.contextMenus.create(
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "request") {
-    models[message.api]().then((res) => {
+    models[message.api](message.params).then((res) => {
       sendResponse(res);
     });
   }

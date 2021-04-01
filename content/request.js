@@ -7,6 +7,7 @@ const request = (apiName, params = {}) => {
         params,
       },
       (response) => {
+        // console.log("from request.js...", response);
         resolve(response);
       }
     );

@@ -11,10 +11,12 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false,
+      visible: true,
       isEdit: false,
+      isSetting: false,
       docList: [],
       cardList: [],
+      token: "",
     };
   }
 
@@ -22,6 +24,12 @@ class App extends Component {
     let { apiRef } = this.props;
     //return internal method
     apiRef({ addToDoc: this.addToDoc });
+
+    request("getToken").then((token) => {
+      this.setState({
+        token,
+      });
+    });
   }
   addToDoc = (info) => {
     const { docList, cardList } = this.state;
@@ -48,6 +56,9 @@ class App extends Component {
       docList,
       cardList,
     });
+  };
+  saveSettings = () => {
+    request("setToken", this.state.token);
   };
   renderCardList = () => {
     const { cardList } = this.state;
@@ -107,8 +118,129 @@ class App extends Component {
       return <textarea className={styles["input-textarea"]}>{doc}</textarea>;
     });
   };
+  renderUtilBar = () => {
+    const { isEdit } = this.state;
+    return (
+      <div className={styles["utils-bar"]}>
+        <div className={styles["icon-btn"]}>
+          <img
+            src={chrome.runtime.getURL("images/yuque.png")}
+            className={styles["operate-img"]}
+            onClick={() => {
+              window.open("https://www.yuque.com/dashboard");
+            }}
+          />
+        </div>
+        <div className={styles["icon-btn"]}>
+          <img
+            src={chrome.runtime.getURL("images/edit.png")}
+            className={styles["operate-img"]}
+            onClick={() => {
+              this.setState({
+                isEdit: !isEdit,
+              });
+            }}
+          />
+        </div>
+        <div className={styles["icon-btn"]}>
+          <img
+            src={chrome.runtime.getURL("images/delete.png")}
+            className={styles["operate-img"]}
+            onClick={() => {
+              this.setState({
+                docList: [],
+                cardList: [],
+              });
+            }}
+          />
+        </div>
+        <div className={styles["icon-btn"]}>
+          <img
+            src={chrome.runtime.getURL("images/setting.png")}
+            className={styles["operate-img"]}
+            onClick={() => {
+              const { isSetting } = this.state;
+              this.setState({
+                isSetting: !isSetting,
+              });
+            }}
+          />
+        </div>
+        <div
+          onClick={() => {
+            request("getUser").then((res) => {
+              console.log("from content.js ...", res);
+            });
+          }}
+        >
+          请求测试
+        </div>
+      </div>
+    );
+  };
+  renderArrow = () => {
+    const { visible } = this.state;
+    return (
+      <div
+        id="arrowIcon"
+        onClick={() => {
+          this.setState({
+            visible: !visible,
+          });
+        }}
+      >
+        <img
+          src={chrome.runtime.getURL(
+            visible ? "images/right-arrow.png" : "images/left-arrow.png"
+          )}
+          className={styles["arrow-img"]}
+        />
+      </div>
+    );
+  };
+  renderSetting = () => {
+    return (
+      <div className={styles["setting-wrap"]}>
+        <div className={styles["settings-operate"]}>
+          <div
+            className={styles["operate-btn"]}
+            onClick={() => {
+              this.setState({
+                isSetting: false,
+              });
+            }}
+          >
+            返回
+          </div>
+          <div
+            className={styles["operate-btn"]}
+            onClick={() => {
+              this.saveSettings();
+            }}
+          >
+            保存
+          </div>
+        </div>
+        <div className={styles["setting-item"]}>
+          <div className={styles["setting-title"]}>用户token：</div>
+          <div className={styles["setting-content"]}>
+            <input
+              value={this.state.token}
+              className={styles["setting-input"]}
+              type="text"
+              onChange={(e) => {
+                this.setState({
+                  token: e.target.value,
+                });
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
   render() {
-    const { visible, isEdit } = this.state;
+    const { visible, isEdit, isSetting } = this.state;
     if (visible) {
       sideDiv.className = "out";
     } else {
@@ -116,79 +248,21 @@ class App extends Component {
     }
     return (
       <div className={styles["sidebar-container"]}>
-        <div className={styles["utils-bar"]}>
-          <div
-            className={styles["operate-btn"]}
-            onClick={() => {
-              window.open("https://www.yuque.com/dashboard");
-            }}
-          >
-            <img
-              src={chrome.runtime.getURL("images/yuque.png")}
-              className={styles["operate-img"]}
-            />
-          </div>
-          <div
-            className={styles["operate-btn"]}
-            onClick={() => {
-              this.setState({
-                isEdit: !isEdit,
-              });
-            }}
-          >
-            <img
-              src={chrome.runtime.getURL("images/edit.png")}
-              className={styles["operate-img"]}
-            />
-          </div>
-          <div
-            className={styles["operate-btn"]}
-            onClick={() => {
-              this.setState({
-                docList: [],
-                cardList: [],
-              });
-            }}
-          >
-            <img
-              src={chrome.runtime.getURL("images/delete.png")}
-              className={styles["operate-img"]}
-            />
-          </div>
-          <div
-            onClick={() => {
-              request("getUser").then((res) => {
-                console.log("from content.js ...", res);
-              });
-            }}
-          >
-            请求测试
-          </div>
-        </div>
+        {this.renderUtilBar()}
         <div className={styles["main-bar"]}>
           <div className={styles["main-title"]}>Document</div>
           <div className={styles["main-container"]}>
-            <div className={styles["list-wrap"]}>
-              {isEdit ? this.renderDocList() : this.renderCardList()}
-            </div>
+            {isSetting ? (
+              this.renderSetting()
+            ) : (
+              <div className={styles["list-wrap"]}>
+                {isEdit ? this.renderDocList() : this.renderCardList()}
+              </div>
+            )}
           </div>
         </div>
-
-        <div
-          id="arrowIcon"
-          onClick={() => {
-            this.setState({
-              visible: !visible,
-            });
-          }}
-        >
-          <img
-            src={chrome.runtime.getURL(
-              visible ? "images/right-arrow.png" : "images/left-arrow.png"
-            )}
-            className={styles["arrow-img"]}
-          />
-        </div>
+        {this.renderArrow()}
+        {/* {this.renderUserDialog()} */}
       </div>
     );
   }
