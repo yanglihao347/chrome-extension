@@ -24,6 +24,13 @@
   transition: all 0.5s;
   color: #595959;
 }
+#sideDiv a{
+  text-decoration: none;
+}
+#sideDiv img{
+  display: inline;
+  filter: none;
+}
 .out {
   right: 0;
 }
@@ -132,9 +139,6 @@
   position: relative;
   overflow: hidden;
   text-align: left;
-}
-.card-item a {
-  /* display: block; */
 }
 .card-item a:hover {
   /* color: #01c1de; */

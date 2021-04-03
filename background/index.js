@@ -10,22 +10,22 @@ import utils from "./utils.js";
 
 const { getStorage, setStorage } = utils;
 
-chrome.contextMenus.create(
-  {
-    type: "normal",
-    title: "添加进文档",
-    contexts: ["all"],
-    onclick: (info) => {
-      console.log(info);
-      // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      //   chrome.tabs.sendMessage(tabs[0].id, info, function (response) {
-      //     console.log(response);
-      //   });
-      // });
-    },
-  },
-  () => {}
-);
+// chrome.contextMenus.create(
+//   {
+//     type: "normal",
+//     title: "添加进文档",
+//     contexts: ["all"],
+//     onclick: (info) => {
+//       console.log(info);
+//       // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+//       //   chrome.tabs.sendMessage(tabs[0].id, info, function (response) {
+//       //     console.log(response);
+//       //   });
+//       // });
+//     },
+//   },
+//   () => {}
+// );
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "request") {
