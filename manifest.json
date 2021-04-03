@@ -12,9 +12,7 @@
     "scripts": ["js/background.js"]
   },
   "permissions": [
-    "contextMenus",
     "storage",
-    "tabs",
     "https://www.yuque.com/*"
   ],
   "content_scripts": [

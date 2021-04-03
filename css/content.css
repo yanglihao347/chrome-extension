@@ -202,7 +202,7 @@
   border-radius: 10px 0 0 10px;
 }
 .arrow-img {
-  display: block;
+  display: block !important;
   width: 24px;
   height: 24px;
 }
