@@ -22,6 +22,7 @@
   top: 0;
   z-index: 99999;
   transition: all 0.5s;
+  color: #595959;
 }
 .out {
   right: 0;
@@ -52,7 +53,8 @@
   height: 30px;
 }
 .main-bar {
-  flex: 1;
+  /* flex: 1; */
+  width: 290px;
 }
 .main-title {
   background: #334455;
@@ -85,16 +87,40 @@
   cursor: pointer;
   border-radius: 5px;
 }
+.setting-item {
+  margin-bottom: 20px;
+}
 .setting-title {
   font-size: 16px;
+  margin-bottom: 5px;
+}
+.setting-content {
+  width: 100%;
 }
 .setting-input {
-  height: 30px;
+  height: 36px;
   width: 100%;
   font-size: 14px;
   outline: none;
   border: none;
-  border-bottom: 1px solid #dedede;
+  border: 1px solid #dedede;
+  border-radius: 5px;
+  padding: 0 10px;
+}
+.select-input {
+  font-size: 14px;
+}
+.radio-group {
+  font-size: 14px;
+  height: 36px;
+  line-height: 36px;
+}
+.radio-label {
+  margin-right: 20px;
+  cursor: pointer;
+}
+.radio-label input {
+  margin-right: 5px;
 }
 .list-wrap {
   padding: 10px;
@@ -102,12 +128,56 @@
 .card-item {
   border: 1px solid #dedede;
   padding: 10px;
-  margin: 10px 0;
+  margin: 20px 0;
   position: relative;
   overflow: hidden;
+  text-align: left;
 }
 .card-item a {
-  color: #01c1de;
+  /* display: block; */
+}
+.card-item a:hover {
+  /* color: #01c1de; */
+  text-decoration: none;
+  /* background: rgba(0,0,255,0.3); */
+}
+.link-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
+}
+.link-keyword {
+  font-size: 14px;
+  color: #87CEFA;
+}
+.link-description {
+  font-size: 12px;
+  color: #999;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.loading-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+}
+.loading-card img {
+  animation: autoRotate 2s linear infinite;
+}
+@keyframes autoRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .input-textarea {
   width: 100%;
@@ -159,23 +229,19 @@
   right: 360px;
 }
 
-.card-item:hover .delete-icon {
-  right: 0;
+.card-item:hover .close-icon {
+  display: block;
 }
 
-.delete-icon {
+.close-icon {
   cursor: pointer;
-  transition: all 0.3s;
   position: absolute;
-  right: -30px;
-  top: 0;
-  height: 100%;
-  width: 30px;
-  background: #f00;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  right: 5px;
+  top: 5px;
+  display: none;
+}
+.close-icon img {
+  display: block;
 }
 
 .test {
@@ -188,4 +254,12 @@
 
 .user-dialog {
   position: absolute;
+}
+
+.empty-tips {
+  padding-top: 30px;
+  font-size: 24px;
+  line-height: 40px;
+  color: #888;
+  text-align: center;
 }

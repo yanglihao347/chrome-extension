@@ -1,4 +1,5 @@
 import { apiAccepter } from "./App.js";
+// import request from "./request.js";
 
 const sideDiv = document.createElement("div"); // 侧边栏容器
 let addBtn = null;
@@ -7,6 +8,10 @@ let dragbox = null;
 const createSideBar = () => {
   sideDiv.id = "sideDiv";
   sideDiv.className = "out";
+  sideDiv.addEventListener("DOMNodeRemoved", (e) => {
+    console.log("from domremoved...", e.target);
+    window.location.reload();
+  });
   document.body.appendChild(sideDiv);
 };
 
@@ -18,7 +23,10 @@ const isDragable = (e) => {
   }
   let aNo = 0;
   for (let i = 0; i < e.path.length; i++) {
-    if (e.path[i].tagName === "A") {
+    if (
+      e.path[i].tagName === "A" &&
+      e.path[i].getAttribute("myattr") !== "no-drag"
+    ) {
       aNo = i;
       break;
     }
@@ -46,25 +54,25 @@ const isDragable = (e) => {
   return flag;
 };
 
-const showAddBtn = (selectionText) => {
-  if (addBtn) {
-    sideDiv.removeChild(addBtn);
-    addBtn = null;
-  }
-  addBtn = document.createElement("div");
-  addBtn.id = "addBtn";
-  addBtn.innerText = "点此添加到文档";
-  addBtn.onclick = () => {
-    console.log("from addbtnclick", selectionText);
-    apiAccepter.addToDoc({ type: "text", selectionText });
-    sideDiv.removeChild(addBtn);
-    addBtn = null;
-  };
-  addBtn.onmouseup = (e) => {
-    e.stopPropagation();
-  };
-  sideDiv.appendChild(addBtn);
-};
+// const showAddBtn = (selectionText) => {
+//   if (addBtn) {
+//     sideDiv.removeChild(addBtn);
+//     addBtn = null;
+//   }
+//   addBtn = document.createElement("div");
+//   addBtn.id = "addBtn";
+//   addBtn.innerText = "点此添加到文档";
+//   addBtn.onclick = () => {
+//     console.log("from addbtnclick", selectionText);
+//     apiAccepter.addToDoc({ type: "text", selectionText });
+//     sideDiv.removeChild(addBtn);
+//     addBtn = null;
+//   };
+//   addBtn.onmouseup = (e) => {
+//     e.stopPropagation();
+//   };
+//   sideDiv.appendChild(addBtn);
+// };
 
 // 定义事件处理方法
 const handleMouseDown = (e) => {
@@ -99,13 +107,13 @@ const handleMouseMove = (e) => {
 };
 
 const handleMouseUp = (e) => {
-  const selectionText = window.getSelection().toString();
-  if (selectionText) {
-    showAddBtn(selectionText);
-  } else if (addBtn) {
-    sideDiv.removeChild(addBtn);
-    addBtn = null;
-  }
+  // const selectionText = window.getSelection().toString();
+  // if (selectionText) {
+  //   showAddBtn(selectionText);
+  // } else if (addBtn) {
+  //   sideDiv.removeChild(addBtn);
+  //   addBtn = null;
+  // }
 
   if (!dragbox) {
     return;
@@ -127,37 +135,38 @@ const handleDragStart = (e) => {
   console.log(e);
   e.preventDefault();
   if (e.target.tagName === "A") {
-    let childElement = null;
-    for (let i = 0; i < e.target.children.length; i++) {
-      if (e.target.children[i].tagName === "IMG") {
-        childElement = {
-          type: "image",
-          src: e.target.children[i].currentSrc,
-          selectionText: "图片",
-        };
-        break;
-      } else if (e.target.children[i].tagName === "SVG") {
-        childElement = {
-          type: "svg",
-          src: e.target.children[i].currentSrc,
-          selectionText: "图片",
-        };
-        break;
-      }
-    }
+    // let childElement = null;
+    // for (let i = 0; i < e.target.children.length; i++) {
+    //   if (e.target.children[i].tagName === "IMG") {
+    //     childElement = {
+    //       type: "image",
+    //       src: e.target.children[i].currentSrc,
+    //       selectionText: "图片",
+    //     };
+    //     break;
+    //   } else if (e.target.children[i].tagName === "SVG") {
+    //     childElement = {
+    //       type: "svg",
+    //       src: e.target.children[i].currentSrc,
+    //       selectionText: "图片",
+    //     };
+    //     break;
+    //   }
+    // }
     window.dragInfo = {
       type: "link",
       href: e.target.href,
       selectionText: e.target.innerText,
-      childElement,
-    };
-  } else {
-    window.dragInfo = {
-      type: "image",
-      src: e.target.currentSrc,
-      selectionText: "图片",
+      // childElement,
     };
   }
+  // else {
+  //   window.dragInfo = {
+  //     type: "image",
+  //     src: e.target.currentSrc,
+  //     selectionText: "图片",
+  //   };
+  // }
 
   if (dragbox) {
     return;

@@ -6,6 +6,9 @@
 // });
 
 import models from "./models.js";
+import utils from "./utils.js";
+
+const { getStorage, setStorage } = utils;
 
 chrome.contextMenus.create(
   {
@@ -27,6 +30,16 @@ chrome.contextMenus.create(
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "request") {
     models[message.api](message.params).then((res) => {
+      sendResponse(res);
+    });
+  }
+  if (message.type === "getStorage") {
+    getStorage(message.key).then((res) => {
+      sendResponse(res);
+    });
+  }
+  if (message.type === "setStorage") {
+    setStorage(message.key, message.value).then((res) => {
       sendResponse(res);
     });
   }

@@ -1,4 +1,5 @@
 import axios from "axios";
+import $ from "jquery";
 
 const getStorage = (key) => {
   return new Promise((resolve, reject) => {
@@ -20,12 +21,42 @@ const setStorage = (key, value) => {
   });
 };
 
-const http = {
+const parseHtml = (htmlStr, url) => {
+  const htmlDom = $.parseHTML(htmlStr);
+  let title = "";
+  let keywords = "";
+  let description = "";
+  for (let i = 0; i < htmlDom.length; i++) {
+    if (htmlDom[i].tagName === "TITLE") {
+      console.log("from title...", htmlDom[i]);
+      title = htmlDom[i].innerText;
+      console.log(htmlDom[i].innerHTML, htmlDom[i].innerText);
+    }
+    // if (htmlDom[i].tagName === "META" && htmlDom[i].name === "keywords") {
+    //   console.log("from keywords...", htmlDom[i]);
+    //   keywords = htmlDom[i].content;
+    // }
+    // if (
+    //   htmlDom[i].tagName === "META" &&
+    //   htmlDom[i].description === "keywords"
+    // ) {
+    //   console.log("from desc...", htmlDom[i]);
+    //   description = htmlDom[i].content;
+    // }
+  }
+  return {
+    title,
+    keywords,
+    description,
+    url,
+  };
+};
+
+const yuque = {
   get: async (url, params = {}) => {
     const xAuthToken = await getStorage("xAuthToken");
     if (!xAuthToken) {
-      alert("请先设置用户token。");
-      return;
+      throw "请先设置用户token。";
     }
     const result = await axios
       .get(`https://www.yuque.com/api/v2${url}`, {
@@ -37,7 +68,7 @@ const http = {
       })
       .catch((err) => {
         console.log("from http.get catch ...", err);
-        alert("token有误或token权限不足，请检查token及权限。");
+        throw "token有误或token权限不足，请检查token及权限。";
       });
     if (result) {
       // 返回值 result.data 格式为 { data: {} }
@@ -48,19 +79,19 @@ const http = {
   post: async (url, params = {}) => {
     const xAuthToken = await getStorage("xAuthToken");
     if (!xAuthToken) {
-      alert("请先设置用户token。");
-      return;
+      throw "请先设置用户token。";
     }
-    const result = await axios.post(
-      `https://www.yuque.com/api/v2${url}`,
-      params,
-      {
+    const result = await axios
+      .post(`https://www.yuque.com/api/v2${url}`, params, {
         headers: {
           "Content-Type": "application/json",
           "X-Auth-Token": xAuthToken,
         },
-      }
-    );
+      })
+      .catch((err) => {
+        console.log("from http.get catch ...", err);
+        throw "token有误或token权限不足，请检查token及权限。";
+      });
     if (result.status === 200) {
       // 返回值 result.data 格式为 { data: {} }
       return result.data;
@@ -70,19 +101,19 @@ const http = {
   put: async (url, params = {}) => {
     const xAuthToken = await getStorage("xAuthToken");
     if (!xAuthToken) {
-      alert("请先设置用户token。");
-      return;
+      throw "请先设置用户token。";
     }
-    const result = await axios.put(
-      `https://www.yuque.com/api/v2${url}`,
-      params,
-      {
+    const result = await axios
+      .put(`https://www.yuque.com/api/v2${url}`, params, {
         headers: {
           "Content-Type": "application/json",
           "X-Auth-Token": xAuthToken,
         },
-      }
-    );
+      })
+      .catch((err) => {
+        console.log("from http.get catch ...", err);
+        throw "token有误或token权限不足，请检查token及权限。";
+      });
     if (result.status === 200) {
       // 返回值 result.data 格式为 { data: {} }
       return result.data;
@@ -92,15 +123,19 @@ const http = {
   delete: async (url) => {
     const xAuthToken = await getStorage("xAuthToken");
     if (!xAuthToken) {
-      alert("请先设置用户token。");
-      return;
+      throw "请先设置用户token。";
     }
-    const result = await axios.delete(`https://www.yuque.com/api/v2${url}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "X-Auth-Token": xAuthToken,
-      },
-    });
+    const result = await axios
+      .delete(`https://www.yuque.com/api/v2${url}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Auth-Token": xAuthToken,
+        },
+      })
+      .catch((err) => {
+        console.log("from http.get catch ...", err);
+        throw "token有误或token权限不足，请检查token及权限。";
+      });
     if (result.status === 200) {
       // 返回值 result.data 格式为 { data: {} }
       return result.data;
@@ -109,4 +144,4 @@ const http = {
   },
 };
 
-export default { http, getStorage, setStorage };
+export default { yuque, parseHtml, getStorage, setStorage };
