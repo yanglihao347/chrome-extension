@@ -54,8 +54,9 @@ const parseHtml = (htmlStr, url) => {
 
 const yuque = {
   get: async (url, params = {}) => {
-    const xAuthToken = await getStorage("xAuthToken");
-    if (!xAuthToken) {
+    const token = await getStorage("token");
+    if (!token) {
+      console.log("token error...", url, params);
       throw "请先设置用户token。";
     }
     const result = await axios
@@ -63,7 +64,7 @@ const yuque = {
         params,
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": xAuthToken,
+          "X-Auth-Token": token,
         },
       })
       .catch((err) => {
@@ -77,15 +78,15 @@ const yuque = {
     return null;
   },
   post: async (url, params = {}) => {
-    const xAuthToken = await getStorage("xAuthToken");
-    if (!xAuthToken) {
+    const token = await getStorage("token");
+    if (!token) {
       throw "请先设置用户token。";
     }
     const result = await axios
       .post(`https://www.yuque.com/api/v2${url}`, params, {
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": xAuthToken,
+          "X-Auth-Token": token,
         },
       })
       .catch((err) => {
@@ -99,15 +100,15 @@ const yuque = {
     return null;
   },
   put: async (url, params = {}) => {
-    const xAuthToken = await getStorage("xAuthToken");
-    if (!xAuthToken) {
+    const token = await getStorage("token");
+    if (!token) {
       throw "请先设置用户token。";
     }
     const result = await axios
       .put(`https://www.yuque.com/api/v2${url}`, params, {
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": xAuthToken,
+          "X-Auth-Token": token,
         },
       })
       .catch((err) => {
@@ -121,15 +122,15 @@ const yuque = {
     return null;
   },
   delete: async (url) => {
-    const xAuthToken = await getStorage("xAuthToken");
-    if (!xAuthToken) {
+    const token = await getStorage("token");
+    if (!token) {
       throw "请先设置用户token。";
     }
     const result = await axios
       .delete(`https://www.yuque.com/api/v2${url}`, {
         headers: {
           "Content-Type": "application/json",
-          "X-Auth-Token": xAuthToken,
+          "X-Auth-Token": token,
         },
       })
       .catch((err) => {

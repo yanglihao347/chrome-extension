@@ -27,10 +27,6 @@ class App extends Component {
     };
   }
 
-  componentWillUnmount() {
-    console.log("from willunmount...");
-  }
-
   componentDidMount() {
     let { apiRef } = this.props;
     // 给外部调用组件内方法
@@ -40,45 +36,15 @@ class App extends Component {
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "visible") {
         console.log("from visible...");
-        request.getStorage("doc").then((doc) => {
-          if (doc) {
-            _this.setState({
-              docList: doc.docList,
-              cardList: doc.cardList,
-            });
-          }
-        });
+        _this.getInitValue();
       } else {
         console.log("from hidden...");
       }
     });
 
-    request.getStorage("token").then((token) => {
-      if (token) {
-        this.setState({
-          token,
-        });
-        request.http("getUser").then((user) => {
-          this.setState({
-            user,
-          });
-          request
-            .http("getRepos", {
-              login: user.login,
-            })
-            .then((repos) => {
-              this.setState({
-                repos: repos.map((repo) => {
-                  return {
-                    value: repo.namespace,
-                    label: repo.name,
-                  };
-                }),
-              });
-            });
-        });
-      }
-    });
+    this.getInitValue();
+  }
+  getInitValue = () => {
     request.getStorage("repo").then((repo) => {
       if (repo) {
         this.setState({
@@ -105,7 +71,35 @@ class App extends Component {
         });
       }
     });
-  }
+    request.getStorage("token").then((token) => {
+      if (token) {
+        this.setState({
+          token,
+        });
+        request.http("getUser").then((user) => {
+          this.setState({
+            user,
+          });
+          request
+            .http("getRepos", {
+              login: user.login,
+            })
+            .then((repos) => {
+              if (repos) {
+                this.setState({
+                  repos: repos.map((repo) => {
+                    return {
+                      value: repo.namespace,
+                      label: repo.name,
+                    };
+                  }),
+                });
+              }
+            });
+        });
+      }
+    });
+  };
   addToDoc = (info) => {
     const { docList, cardList } = this.state;
     console.log(info, docList, cardList);
@@ -361,12 +355,35 @@ class App extends Component {
                   token: e.target.value,
                 });
               }}
-              onBlur={() => {
-                request.http("getUser").then((res) => {
-                  this.setState({
-                    user: res,
+              onBlur={(e) => {
+                if (e.target.value) {
+                  request.setStorage("token", e.target.value).then(() => {
+                    toast.success("设置用户token成功");
+                    request.http("getUser").then((user) => {
+                      this.setState({
+                        user,
+                      });
+                      request
+                        .http("getRepos", {
+                          login: user.login,
+                        })
+                        .then((repos) => {
+                          if (repos) {
+                            this.setState({
+                              repos: repos.map((repo) => {
+                                return {
+                                  value: repo.namespace,
+                                  label: repo.name,
+                                };
+                              }),
+                            });
+                          }
+                        });
+                    });
                   });
-                });
+                } else {
+                  toast.error("token不能为空");
+                }
               }}
             />
           </div>
@@ -377,7 +394,7 @@ class App extends Component {
             <Select
               className={styles["select-input"]}
               value={repo}
-              options={repos}
+              options={repos || []}
               onChange={(value) => {
                 console.log("from onchange...", value);
                 this.setState({
