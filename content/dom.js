@@ -9,8 +9,10 @@ const createSideBar = () => {
   sideDiv.id = "sideDiv";
   sideDiv.className = "out";
   sideDiv.addEventListener("DOMNodeRemoved", (e) => {
-    console.log("from domremoved...", e.target);
-    window.location.reload();
+    // console.log("from domremoved...", e.target);
+    if (e.target.id === "sideDiv") {
+      window.location.reload();
+    }
   });
   document.body.appendChild(sideDiv);
 };
