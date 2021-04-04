@@ -8,12 +8,12 @@ let dragbox = null;
 const createSideBar = () => {
   sideDiv.id = "sideDiv";
   sideDiv.className = "out";
-  sideDiv.addEventListener("DOMNodeRemoved", (e) => {
-    // console.log("from domremoved...", e.target);
-    if (e.target.id === "sideDiv") {
-      window.location.reload();
-    }
-  });
+  // sideDiv.addEventListener("DOMNodeRemoved", (e) => {
+  //   // console.log("from domremoved...", e.target);
+  //   if (e.target.id === "sideDiv") {
+  //     window.location.reload();
+  //   }
+  // });
   document.body.appendChild(sideDiv);
 };
 

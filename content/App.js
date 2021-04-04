@@ -45,6 +45,11 @@ class App extends Component {
     this.getInitValue();
   }
   getInitValue = () => {
+    request.getStorage('visible').then(visible => {
+      this.setState({
+        visible
+      })
+    })
     request.getStorage("repo").then((repo) => {
       if (repo) {
         this.setState({
@@ -180,6 +185,7 @@ class App extends Component {
                 docList,
                 cardList,
               });
+              request.setStorage('doc', { docList, cardList });
             }}
           >
             <img width="12px" src={chrome.runtime.getURL("images/close.png")} />
@@ -308,6 +314,9 @@ class App extends Component {
           this.setState({
             visible: !visible,
           });
+          request.setStorage('visible', !visible).then(res => {
+            console.log(res);
+          })
         }}
       >
         <img
@@ -482,6 +491,25 @@ ReactDOM.render(
   }),
   sideDiv
 );
+
+// 解决百度等页面重新渲染导致根节点被移除的问题
+sideDiv.addEventListener("DOMNodeRemoved", (e) => {
+  console.log("from domremoved...", e.target);
+  if (e.target.id === "sideDiv") {
+    const styleTags = document.getElementsByTagName('style');
+    let contentStyle = null;
+    for(let i = 0; i < styleTags.length; i ++) {
+      if(styleTags[i].innerHTML.indexOf('#content-flag-tag-sideDiv') !== -1) {
+        contentStyle = styleTags[i];
+        break;
+      }
+    }
+    setTimeout(() => {
+      document.head.appendChild(contentStyle);
+      document.body.appendChild(e.target);
+    }, 200);
+  }
+});
 
 // 组件内方法给外部js文件调用
 export { apiAccepter };
