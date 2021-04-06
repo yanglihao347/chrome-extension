@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import Select from "react-select";
 import { RadioGroup, Radio } from "react-radio-group";
 import toast, { Toaster } from "react-hot-toast";
+import BraftEditor from 'braft-editor';
+import 'braft-editor/dist/index.css';
 import "./dom.js";
 import styles from "../css/content.css";
 import request from "./request.js";
@@ -24,6 +26,9 @@ class App extends Component {
       repos: null,
       repo: "",
       publicType: "0",
+      spaceItem: '',
+      editorState: BraftEditor.createEditorState(''),
+      outputHTML: '<p></p>',
     };
   }
 
@@ -134,9 +139,63 @@ class App extends Component {
     request.setStorage("token", this.state.token);
     // request.setStorage("repo", this.state.repo);
   };
+  renderSpace  = (customKey) => {
+    const { spaceItem, editorState, outputHTML } = this.state;
+    return (spaceItem === customKey
+      ?
+      <BraftEditor
+        value={editorState}
+        ref={instance => this.editorInstance = instance}
+        controls={['bold', 'italic', 'underline', 'list-ul', 'list-ol', 'blockquote', 'code', 'redo', 'undo']}
+        onChange={(editorState) => {
+          this.setState({
+            editorState,
+            outputHTML: editorState.toHTML()
+          })
+        }}
+        onBlur={(value) => {
+          const { cardList, docList } = this.state;
+          if (!value.isEmpty()) {
+            cardList.splice(Number(customKey) + 1, 0, {
+              type: 'text',
+              outputHTML
+            });
+            docList.splice(Number(customKey) + 1, 0, outputHTML);
+            this.setState({
+              cardList,
+              docList,
+              spaceItem: '',
+              editorState: BraftEditor.createEditorState(''),
+              outputHTML: '<p></p>',
+            })
+            request.setStorage('doc', { docList, cardList });
+          } else {
+            this.setState({
+              spaceItem: '',
+              editorState: BraftEditor.createEditorState(''),
+              outputHTML: '<p></p>',
+            });
+            request.setStorage('doc', { docList, cardList });
+          }
+        }}
+      />
+      :
+      <div customkey={customKey} className={styles['space-item']} onClick={(e)=> {
+        if(!this.editorInstance) {
+          this.setState({
+          spaceItem: e.target.getAttribute('customkey')
+        })
+        setTimeout(() => {this.editorInstance.requestFocus()}, 100)
+        }
+      }}></div>
+    )
+  }
   renderCardList = () => {
     const { cardList } = this.state;
-    return cardList.map((item, index) => {
+    console.log('from cardList,123...', cardList);
+    return <>
+    {this.renderSpace('-1')}
+    {cardList.map((item, index) => {
       let innerHTML = "";
       if (item.type === "link") {
         const { title, keywords, description, url } = item.content;
@@ -161,7 +220,11 @@ class App extends Component {
           />
         );
       } else if (item.type === "text") {
-        innerHTML = item.selectionText;
+        innerHTML = <div id={`text-card-${index}`}></div>;
+        setTimeout(() => {
+          const container = document.getElementById(`text-card-${index}`);
+          container.innerHTML = item.outputHTML;
+        })
       } else if (item.type === "loading") {
         innerHTML = (
           <div className={styles["loading-card"]}>
@@ -173,11 +236,28 @@ class App extends Component {
         );
       }
       return (
-        <div className={styles["card-item"]}>
+        <>
+        <div className={styles["card-item"]} onClick={() => {
+          if(item.type === 'text' && !this.editorInstance) {
+            const { docList, cardList } = this.state;
+            cardList.splice(index, 1);
+            docList.splice(index, 1);
+            this.setState({
+              cardList,
+              docList,
+              spaceItem: (index - 1).toString(),
+              editorState: BraftEditor.createEditorState(item.outputHTML),
+              outputHTML: item.outputHTML
+            })
+            setTimeout(() => {this.editorInstance.requestFocus();}, 100);
+          }
+        }}>
           {innerHTML}
+          
           <div
             className={styles["close-icon"]}
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               const { docList, cardList } = this.state;
               docList.splice(index, 1);
               cardList.splice(index, 1);
@@ -191,8 +271,11 @@ class App extends Component {
             <img width="12px" src={chrome.runtime.getURL("images/close.png")} />
           </div>
         </div>
+        {this.renderSpace(index.toString())}
+        </>
       );
-    });
+    })}
+    </>
   };
   // renderDocList = () => {
   //   const { docList } = this.state;
@@ -465,7 +548,14 @@ class App extends Component {
                 {cardList.length ? (
                   this.renderCardList()
                 ) : (
-                  <div className={styles["empty-tips"]}>
+                  <div
+                    className={styles["empty-tips"]}
+                    // onClick={() => {
+                    //   this.setState({
+                    //     spaceItem: '-1'
+                    //   })
+                    // }}
+                  >
                     拖拽链接至此处
                     <br />
                     创建新文档
@@ -494,7 +584,7 @@ ReactDOM.render(
 
 // 解决百度等页面重新渲染导致根节点被移除的问题
 sideDiv.addEventListener("DOMNodeRemoved", (e) => {
-  console.log("from domremoved...", e.target);
+  // console.log("from domremoved...", e.target);
   if (e.target.id === "sideDiv") {
     const styleTags = document.getElementsByTagName('style');
     let contentStyle = null;

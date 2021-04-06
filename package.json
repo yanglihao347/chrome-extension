@@ -21,6 +21,7 @@
     "@babel/preset-env": "^7.13.12",
     "@babel/preset-react": "^7.13.13",
     "axios": "^0.21.1",
+    "braft-editor": "^2.3.9",
     "css-loader": "^5.2.0",
     "jquery": "^3.6.0",
     "react": "^17.0.2",

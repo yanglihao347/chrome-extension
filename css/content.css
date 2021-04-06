@@ -118,10 +118,15 @@
 .list-wrap {
   padding: 10px;
 }
+.space-item {
+  height: 20px;
+  margin: 5px 0;
+  cursor: pointer;
+}
 .card-item {
   border: 1px solid #dedede;
   padding: 10px;
-  margin: 20px 0;
+  /* margin: 20px 0; */
   position: relative;
   overflow: hidden;
   text-align: left;
